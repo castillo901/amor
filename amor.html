@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Revivir declaración ✨</title>
+
+<!-- Fuente estilo retro/pixel -->
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+
+<style>
+  :root{
+    --fucsia:#ff2bd6;
+    --cian:#22f7ff;
+    --magenta:#ff00a8;
+    --panel-bg: rgba(0,0,0,0.55);
+    --borde-neon: 0 0 10px var(--cian), 0 0 20px var(--cian), 0 0 40px var(--cian);
+    --texto-neon: 0 0 6px var(--magenta), 0 0 12px var(--magenta), 0 0 24px var(--magenta);
+  }
+  *{box-sizing:border-box}
+  html,body{height:100%;margin:0;background:#070313;color:white;font-family:'Press Start 2P', system-ui, monospace;overflow:hidden;}
+  /* Lienzo de estrellas */
+  #stars{position:fixed;inset:0;z-index:-1;background:#050210;}
+  /* Contenido centrado */
+  .wrap{min-height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:28px;padding:28px}
+  /* Panel de frase */
+  .panel{
+    width:min(880px, 92vw);
+    padding:26px 22px;
+    border-radius:18px;
+    border:2px solid #00f5ff44;
+    outline:2px solid #00f5ff22;
+    background:linear-gradient(180deg, #0d072055, #09041f88);
+    box-shadow: var(--borde-neon);
+    text-align:center;
+  }
+  .frase{
+    line-height:1.7;
+    color:#ffd7ff;
+    text-shadow: var(--texto-neon);
+    letter-spacing:0.8px;
+    min-height:8lh;
+    white-space:pre-wrap;
+    margin:0;
+    font-size:clamp(12px, 2.3vw, 18px);
+  }
+
+  /* Botón */
+  .btn{
+    cursor:pointer;
+    border:none;
+    padding:16px 22px;
+    border-radius:14px;
+    font-weight:700;
+    letter-spacing:1px;
+    color:#0a0416;
+    background: #ffb2ff;
+    box-shadow: 0 0 12px #ff5dff88, inset 0 0 8px #fff;
+    transition: transform .08s ease, box-shadow .2s ease;
+  }
+  .btn:hover{ transform: translateY(-2px); box-shadow: 0 0 16px #ff5dffcc, inset 0 0 10px #fff;}
+  .btn:active{ transform: translateY(0); }
+
+  /* Tarjeta corazón + contador */
+  .card{
+    width:min(760px, 92vw);
+    padding:26px 22px 30px;
+    border-radius:18px;
+    border:2px solid #ff00ff44;
+    outline:2px solid #ff00ff22;
+    background:linear-gradient(180deg, #0b042055, #09041f88);
+    box-shadow: 0 0 10px #ff00ff99, 0 0 26px #ff00ff66;
+    text-align:center;
+  }
+  .heart-wrap{ position:relative; width:100%; height:180px; display:flex; align-items:center; justify-content:center; margin-bottom:10px;}
+  .heart{
+    width:140px; height:140px;
+    background: var(--magenta);
+    transform: rotate(45deg) scale(0);
+    box-shadow: 0 0 20px #ff47dd, 0 0 40px #ff47dd;
+    border-radius: 20px 20px 0 0;
+    transition: transform 0.8s ease;
+  }
+  .heart::before, .heart::after{
+    content:"";
+    position:absolute;
+    width:140px;height:140px;background:var(--magenta);
+    border-radius:50%;
+    box-shadow:inherit;
+  }
+  .heart::before{ left:-70px; top:-0px; }
+  .heart::after{ left:0px; top:-70px; }
+
+  /* Vaquita (SVG) */
+  .cow{
+    position:absolute; bottom:-8px;
+    width:160px; transform: translateY(40px) scale(0.95);
+    filter: drop-shadow(0 0 6px #ffffffaa);
+    opacity:0; transition: all 0.8s ease;
+  }
+
+  .contador{
+    color:#ffffff;
+    text-shadow: 0 0 7px #fff, 0 0 16px #ff7bff;
+    font-size:clamp(13px, 2.1vw, 18px);
+    line-height:1.9;
+  }
+  .contador b{ color:#ffe600; text-shadow: 0 0 10px #fff37a; }
+
+  .sub{ margin-top:8px; color:#fff; text-shadow:0 0 8px #fff; font-size:clamp(12px, 2vw, 16px); }
+
+  /* Ocultables */
+  .hidden{ display:none; }
+</style>
+</head>
+<body>
+
+<canvas id="stars"></canvas>
+
+<div class="wrap">
+
+  <!-- Panel con la frase que se “tipea” -->
+  <section class="panel">
+    <p id="frase" class="frase"></p>
+  </section>
+
+  <!-- Tarjeta corazón + contador -->
+  <section id="loveCard" class="card hidden">
+    <div class="heart-wrap">
+      <div class="heart"></div>
+
+      <!-- Vaquita en SVG sosteniendo el corazón -->
+      <svg class="cow" viewBox="0 0 200 160" aria-label="vaquita">
+        <ellipse cx="100" cy="110" rx="62" ry="40" fill="#fff"/>
+        <circle cx="70" cy="70" r="28" fill="#fff"/>
+        <circle cx="130" cy="70" r="28" fill="#fff"/>
+        <ellipse cx="85" cy="105" rx="14" ry="10" fill="#2b2b2b"/>
+        <ellipse cx="120" cy="95" rx="12" ry="9" fill="#2b2b2b"/>
+        <ellipse cx="65" cy="70" rx="10" ry="8" fill="#2b2b2b"/>
+        <ellipse cx="100" cy="88" rx="28" ry="16" fill="#ffd0df" stroke="#ff9ac0" stroke-width="2"/>
+        <circle cx="92" cy="88" r="3.2" fill="#333"/>
+        <circle cx="108" cy="88" r="3.2" fill="#333"/>
+        <circle cx="80" cy="66" r="4.2" fill="#111"/>
+        <circle cx="120" cy="66" r="4.2" fill="#111"/>
+        <ellipse cx="53" cy="52" rx="10" ry="14" fill="#fff" transform="rotate(-20 53 52)"/>
+        <ellipse cx="147" cy="52" rx="10" ry="14" fill="#fff" transform="rotate(20 147 52)"/>
+        <rect x="76" y="132" width="12" height="16" rx="4" fill="#2b2b2b"/>
+        <rect x="112" y="132" width="12" height="16" rx="4" fill="#2b2b2b"/>
+        <rect x="55" y="108" width="14" height="12" rx="6" fill="#2b2b2b"/>
+        <rect x="131" y="108" width="14" height="12" rx="6" fill="#2b2b2b"/>
+      </svg>
+    </div>
+
+    <div class="contador" id="contador"></div>
+    <div class="sub">Y cada día te amo más ♥</div>
+  </section>
+
+  <!-- Botón -->
+  <button id="btn" class="btn">REVIVIR DECLARACIÓN ✨</button>
+
+  <!-- Música de fondo (cambia "musica.mp3" por tu archivo o URL) -->
+  <audio id="bgm" src="musica.mp3" loop preload="none"></audio>
+
+</div>
+
+<script>
+/* ========= CONFIGURABLE ========= */
+const FRASE = `Las personas aparecen y desaparecen como capítulos que se cierran, pero contigo no quiero pasar de página. No busco un final perfecto, solo escribir contigo una historia que valga la pena leer una y otra vez, incluso cuando el resto del mundo se vuelva efímero.`;
+const DIAS_FIJOS = 121; // Días fijos
+const ZONA_HORARIA = 'America/Guayaquil'; // Ecuador
+/* ================================= */
+
+/* --- Tipeo tras el clic --- */
+const btn = document.getElementById('btn');
+const p = document.getElementById('frase');
+const card = document.getElementById('loveCard');
+let escribiendo = false;
+
+btn.addEventListener('click', async () => {
+  if (escribiendo) return; 
+  escribiendo = true;
+
+  // Reinicia todo
+  p.textContent = "";
+  card.classList.add("hidden");
+  document.querySelector(".heart").style.transform = "rotate(45deg) scale(0)";
+  document.querySelector(".cow").style.opacity = "0";
+
+  // Reinicia música
+  const audio = document.getElementById('bgm');
+  if (audio && audio.src) { 
+    audio.currentTime = 0; 
+    audio.play().catch(()=>{}); 
+  }
+
+  // Vuelve a escribir la frase
+  await typeWriter(FRASE, p, 20);
+
+  // Ahora sí muestra de nuevo la tarjeta y anima
+  card.classList.remove("hidden");
+  setTimeout(() => {
+    document.querySelector(".heart").style.transform = "rotate(45deg) scale(1)";
+    document.querySelector(".cow").style.opacity = "1";
+  }, 100); 
+
+  escribiendo = false;
+});
+
+function typeWriter(text, target, speedMs){
+  return new Promise(resolve=>{
+    target.textContent = '';
+    let i=0;
+    const timer = setInterval(()=>{
+      target.textContent += text.charAt(i++);
+      if(i >= text.length){ clearInterval(timer); resolve(); }
+    }, speedMs);
+  });
+}
+
+/* --- Contador estilo reloj con hora de Ecuador --- */
+const contEl = document.getElementById('contador');
+const fmt = new Intl.DateTimeFormat('es-EC', {
+  timeZone: ZONA_HORARIA, hour: '2-digit', minute: '2-digit', second: '2-digit', hourCycle:'h23'
+});
+
+function tic(){
+  const parts = fmt.formatToParts(new Date());
+  const h = parts.find(p=>p.type==='hour').value;
+  const m = parts.find(p=>p.type==='minute').value;
+  const s = parts.find(p=>p.type==='second').value;
+
+  contEl.innerHTML = `
+    Me enamoré de ti hace...<br>
+    <b>${DIAS_FIJOS}</b> días,&nbsp;
+    <b>${h}</b> hs,&nbsp;
+    <b>${m}</b> min,&nbsp;
+    <b>${s}</b> seg
+  `;
+}
+tic();
+setInterval(tic, 1000);
+
+/* --- Estrellas en movimiento (canvas) --- */
+const canvas = document.getElementById('stars');
+const ctx = canvas.getContext('2d');
+let W, H, stars;
+
+function resize(){
+  W = canvas.width = window.innerWidth;
+  H = canvas.height = window.innerHeight;
+  stars = [];
+  for (let i = 0; i < 150; i++) {
+    stars.push({
+      x: Math.random() * W,
+      y: Math.random() * H,
+      radius: Math.random() * 1.5 + 0.5,
+      dx: (Math.random() - 0.5) * 0.3,
+      dy: (Math.random() - 0.5) * 0.3,
+      alpha: Math.random(),
+      dAlpha: (Math.random() * 0.02) * (Math.random() < 0.5 ? -1 : 1)
+    });
+  }
+}
+resize();
+window.addEventListener('resize', resize);
+
+function draw(){
+  ctx.fillStyle = "rgba(5, 2, 20, 1)";
+  ctx.fillRect(0,0,W,H);
+
+  for (let s of stars){
+    s.x += s.dx;
+    s.y += s.dy;
+    s.alpha += s.dAlpha;
+
+    if(s.alpha <= 0 || s.alpha >= 1) s.dAlpha = -s.dAlpha;
+    if(s.x < 0 || s.x > W) s.dx = -s.dx;
+    if(s.y < 0 || s.y > H) s.dy = -s.dy;
+
+    ctx.beginPath();
+    ctx.arc(s.x, s.y, s.radius, 0, Math.PI*2);
+    ctx.fillStyle = `rgba(255, 255, 255, ${s.alpha})`;
+    ctx.fill();
+  }
+  requestAnimationFrame(draw);
+}
+draw();
+</script>
+</body>
+</html>
